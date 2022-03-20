@@ -4,7 +4,9 @@ const Recruiter = require("../model/recruiterModel.js");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
-// var { authorizedUser } = require("../middleware/Authorrization.js");
+var { authorizedUser } = require("../middleware/Authorization.js");
+
+// Create account for Candidate
 
 router.post("/register", async (req, res) => {
   console.log(req.body);
@@ -27,63 +29,101 @@ router.post("/register", async (req, res) => {
       }
     );
 
-    let { _id, email, isCandidate, ...others } = savedUser._doc;
-    res.status(200).send({ _id, email, isCandidate, token });
+    let { password, ...others } = savedUser._doc;
+    res.status(200).send({ ...others, token });
   } catch (e) {
     console.log(e);
     res.status(500).json(e);
   }
 });
 
+// Both candidate and recruiter Login where return token for Authentication
+// first Check with Candidate collection ,if user not Available then
+// Second check with Recruiter collection
+
 router.post("/login", async (req, res) => {
   console.log(req.body);
   const isCandidateExist = await Candidate.findOne({ email: req.body.email });
-
   if (isCandidateExist) {
-    var token = await jwt.sign(
-      { email: req.body.email },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "3d",
-      }
-    );
+    try {
+      let user = await bcrypt.compare(
+        req.body.password,
+        isCandidateExist.password
+      );
+      console.log(user);
+      if (!user) return res.status(400).send({ msg: "invalide Credential" });
 
-    let { password, ...others } = isCandidateExist._doc;
+      var token = await jwt.sign(
+        { email: req.body.email },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "3d",
+        }
+      );
 
-    return res.status(200).send({ ...others, token });
-  }
+      let { password, ...others } = isCandidateExist._doc;
 
-  const isRecruiterExist = await Recruiter.findOne({ email: req.body.email });
-  if (isRecruiterExist) {
-    var token = await jwt.sign(
-      { email: req.body.email },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "3d",
-      }
-    );
+      return res.status(200).send({ ...others, token });
+    } catch (e) {
+      console.log(e);
+      res.status(500).json(e);
+    }
+  } else {
+    const isRecruiterExist = await Recruiter.findOne({
+      email: req.body.email,
+    });
+    if (!isRecruiterExist)
+      return res.status(400).send({ msg: "invalide Credential" });
+    try {
+      let user = await bcrypt.compare(
+        req.body.password,
+        isRecruiterExist.password
+      );
+      if (!user) return res.status(400).send({ msg: "invalide Credential" });
 
-    let { password, ...others } = isRecruiterExist._doc;
+      var token = await jwt.sign(
+        { email: req.body.email },
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "3d",
+        }
+      );
 
-    return res.status(200).send({ ...others, token });
+      let { password, ...others } = isRecruiterExist._doc;
+
+      return res.status(200).send({ ...others, token });
+    } catch (e) {
+      console.log(e);
+      res.status(500).json(e);
+    }
   }
 });
 
-router.post("/update", async (req, res) => {
+// To update Candidate Details
+
+router.post("/update", authorizedUser, async (req, res) => {
   // console.log(req.body);
-  const updateCandidate = await Candidate.findOneAndUpdate(
-    { email: req.body.email },
-    req.body,
-    { new: true }
-  );
-  res.status(200).send(updateCandidate);
+  try {
+    const updateCandidate = await Candidate.findOneAndUpdate(
+      { email: req.body.email },
+      req.body,
+      { new: true }
+    );
+    res.status(200).send(updateCandidate);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(e);
+  }
 });
-router.get("/getCandidates/:id", async (req, res) => {
+
+// Get the Candidate who applied to particular job by jobId
+
+router.get("/getCandidates/:id", authorizedUser, async (req, res) => {
   console.log(req.params);
   const { id } = req.params;
   let CandidateList = [];
   try {
-    const updatePostedJob = await Candidate.find({}, function (error, user) {
+    const result = await Candidate.find({}, function (error, user) {
       if (error) return res.status(500).json(error);
       if (!user) return res.status(500).json({ msg: "no job available" });
 

@@ -5,11 +5,9 @@ const connectDB = require("./connection.js");
 const candidateRouter = require("./routes/candidateRoute.js");
 const recruiterRouter = require("./routes/recruiterRoute.js");
 const jobRouter = require("./routes/jobRoute.js");
-// var { authorizedUser } = require("./middleware/Authorrization.js");
 const app = express();
 
 app.use(express.json({ limit: "50mb" }));
-// app.use(express.urlencoded({ limit: "50mb" }));
 dotenv.config();
 connectDB();
 app.use(cors());
@@ -24,6 +22,6 @@ app.use("/api/candidate", candidateRouter);
 app.use("/api/recruiter", recruiterRouter);
 app.use("/api/job", jobRouter);
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`server start at ${PORT}`);
 });

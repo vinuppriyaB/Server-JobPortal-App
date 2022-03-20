@@ -4,10 +4,12 @@ const Job = require("../model/jobModel.js");
 const Candidate = require("../model/candidateModel.js");
 const Recruiter = require("../model/recruiterModel.js");
 const router = express.Router();
+var { authorizedUser } = require("../middleware/Authorization.js");
 
-router.post("/postjob", async (req, res) => {
-  //   console.log(req.body);
+////// authorizedUser ////// To Authenticate the user with JWT token
 
+//  Post the job by Recruiter
+router.post("/postjob", authorizedUser, async (req, res) => {
   try {
     const newJob = new Job(req.body);
     const savedJob = await newJob.save();
@@ -18,7 +20,10 @@ router.post("/postjob", async (req, res) => {
     res.status(500).json(e);
   }
 });
-router.get("/getalljob", async (req, res) => {
+
+//  Get all job to display to the user
+
+router.get("/getalljob", authorizedUser, async (req, res) => {
   try {
     const allPost = await Job.find();
 
@@ -28,7 +33,10 @@ router.get("/getalljob", async (req, res) => {
     res.status(500).json(e);
   }
 });
-router.get("/getrecruiterpost/:id", async (req, res) => {
+
+//  Get only the job which is posted by respective Recruiter by Recruiter ID
+
+router.get("/getrecruiterpost/:id", authorizedUser, async (req, res) => {
   console.log(req.params);
   const { id } = req.params;
   try {
@@ -40,7 +48,10 @@ router.get("/getrecruiterpost/:id", async (req, res) => {
     res.status(500).json(e);
   }
 });
-router.get("/getjob/:id", async (req, res) => {
+
+// Get job By it ID to update the JobDetail
+
+router.get("/getjob/:id", authorizedUser, async (req, res) => {
   console.log(req.params);
   const { id } = req.params;
   try {
@@ -52,7 +63,10 @@ router.get("/getjob/:id", async (req, res) => {
     res.status(500).json(e);
   }
 });
-router.get("/delete/:id", async (req, res) => {
+
+// Delete the Job by it ID
+
+router.delete("/delete/:id", authorizedUser, async (req, res) => {
   console.log(req.params);
   const { id } = req.params;
   try {
@@ -64,7 +78,10 @@ router.get("/delete/:id", async (req, res) => {
     res.status(500).json(e);
   }
 });
-router.put("/updatejob/:id", async (req, res) => {
+
+// Update the Job by it ID
+
+router.put("/updatejob/:id", authorizedUser, async (req, res) => {
   console.log(req.params);
   console.log(req.body);
   const { id } = req.params;
@@ -80,7 +97,11 @@ router.put("/updatejob/:id", async (req, res) => {
     res.status(500).json(e);
   }
 });
-router.post("/apply/:id1/:id2", async (req, res) => {
+
+// one Update the JobDetail by Candidate detail who Apply for that job
+// two update Candidate collection by job id to which they applied
+
+router.post("/apply/:id1/:id2", authorizedUser, async (req, res) => {
   console.log(req.params);
   const { id1, id2 } = req.params;
   try {

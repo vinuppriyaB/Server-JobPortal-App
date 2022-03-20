@@ -5,6 +5,10 @@ const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 var { authorizedUser } = require("../middleware/Authorization.js");
 
+////// authorizedUser ////// To Authenticate the user with JWT token
+
+// Create account for Recruiter
+
 router.post("/register", async (req, res) => {
   //   console.log(req.body);
   const isuserExist = await Recruiter.findOne({ email: req.body.email });
@@ -33,12 +37,35 @@ router.post("/register", async (req, res) => {
     res.status(500).json(e);
   }
 });
+
+// update the Recruiter Details
+
 router.post("/update", authorizedUser, async (req, res) => {
   // console.log(req.body);
-  const updateRecruiter = await Recruiter.findOneAndUpdate(
-    { email: req.body.email },
-    req.body
-  );
-  console.log(updateRecruiter);
+  try {
+    const updateRecruiter = await Recruiter.findOneAndUpdate(
+      { email: req.body.email },
+      req.body
+    );
+    // console.log(updateRecruiter);
+    res.status(200).send(updateRecruiter);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(e);
+  }
+});
+
+// Get the Recruiter Detail by ID
+
+router.get("/getrecruiterdetail/:id", authorizedUser, async (req, res) => {
+  console.log(req.params);
+  const { id } = req.params;
+  try {
+    const getRecruiter = await Recruiter.findById(id);
+    res.status(200).send(getRecruiter);
+  } catch (e) {
+    console.log(e);
+    res.status(500).json(e);
+  }
 });
 module.exports = router;
