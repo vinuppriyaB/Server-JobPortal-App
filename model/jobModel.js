@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { object } = require("webidl-conversions");
-const recruiter = require("./recruiterModel.js");
+const Recruiter = require("./recruiterModel.js");
 const jobSchema = mongoose.Schema(
   {
     companyName: { type: String, trim: true },
@@ -8,10 +8,16 @@ const jobSchema = mongoose.Schema(
     role: { type: String, trim: true },
     place: { type: String, trim: true },
     jobType: { type: String, trim: true },
+    education: { type: String, trim: true },
+    ExpFrom: { type: Number, trim: true },
+    ExpTo: { type: Number, trim: true },
+    mustHave: [{ type: String, trim: true }],
+    goodToHave: [{ type: String, trim: true }],
     CTC: { type: String, trim: true },
     opening: { type: Number, trim: true },
     roundCount: { type: Number, trim: true },
     Rounds: [{ type: String, trim: true }],
+    desc: { type: String, trim: true },
     postedby: { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter" },
     appliedby: [{ type: mongoose.Schema.Types.ObjectId, ref: "Candidate" }],
   },

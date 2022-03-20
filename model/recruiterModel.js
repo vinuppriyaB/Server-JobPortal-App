@@ -19,7 +19,7 @@ const recruiterSchema = mongoose.Schema(
     PostedJob: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
   },
   {
-    timestampes: true,
+    timestamps: true,
   }
 );
 

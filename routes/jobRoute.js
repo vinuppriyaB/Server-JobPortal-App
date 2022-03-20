@@ -10,6 +10,7 @@ var { authorizedUser } = require("../middleware/Authorization.js");
 
 //  Post the job by Recruiter
 router.post("/postjob", authorizedUser, async (req, res) => {
+  console.log(req.body);
   try {
     const newJob = new Job(req.body);
     const savedJob = await newJob.save();
