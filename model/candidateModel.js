@@ -29,7 +29,7 @@ const candidateSchema = mongoose.Schema(
     jobApplied: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recruiter" }],
   },
   {
-    timestampes: true,
+    timestamps: true,
   }
 );
 

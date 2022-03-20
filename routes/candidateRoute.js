@@ -4,12 +4,15 @@ const Recruiter = require("../model/recruiterModel.js");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
+
 var { authorizedUser } = require("../middleware/Authorization.js");
+
+////// authorizedUser ////// To Authenticate the user with JWT token
 
 // Create account for Candidate
 
 router.post("/register", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const isuserExist = await Candidate.findOne({ email: req.body.email });
 
   if (isuserExist) return res.status(400).json("account already exist");
@@ -42,7 +45,7 @@ router.post("/register", async (req, res) => {
 // Second check with Recruiter collection
 
 router.post("/login", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const isCandidateExist = await Candidate.findOne({ email: req.body.email });
   if (isCandidateExist) {
     try {
@@ -119,7 +122,7 @@ router.post("/update", authorizedUser, async (req, res) => {
 // Get the Candidate who applied to particular job by jobId
 
 router.get("/getCandidates/:id", authorizedUser, async (req, res) => {
-  console.log(req.params);
+  // console.log(req.params);
   const { id } = req.params;
   let CandidateList = [];
   try {

@@ -4,13 +4,13 @@ const Recruiter = require("../model/recruiterModel");
 
 const authorizedUser = async (req, res, next) => {
   let token = req.headers.token;
-  console.log(token);
+  // console.log(token);
   if (!token) {
     res.status(401).send({ msg: "user is not authorized" });
   }
   try {
     let decode = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    console.log(decode);
+    // console.log(decode);
 
     req.user = await Candidate.findOne({ email: decode.email }).select(
       "-password"
