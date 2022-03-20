@@ -23,7 +23,6 @@ const candidateSchema = mongoose.Schema(
         endYear: { type: String, required: true },
       },
     ],
-    experience: { type: String, trim: true },
     skills: [{ type: String, trim: true }],
     resume: { type: String, required: true },
     jobApplied: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recruiter" }],
