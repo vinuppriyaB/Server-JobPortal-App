@@ -11,9 +11,19 @@ var { authorizedUser } = require("../middleware/Authorization.js");
 
 router.post("/register", async (req, res) => {
   //   console.log(req.body);
+
   const isuserExist = await Recruiter.findOne({ email: req.body.email });
 
   if (isuserExist) return res.status(400).json("account already exist");
+
+  const password = req.body.password;
+  passwordValidation(password);
+  function passwordValidation(password) {
+    if (password.length <= 8)
+      return res.status(400).json("password must have 8 character");
+    if (!password.includes(["!", "@", "&", "%", "&", "$"]))
+      return res.status(400).json("password must have special character");
+  }
 
   try {
     const salt = await bcrypt.genSalt(9);
